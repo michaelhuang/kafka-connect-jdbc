@@ -166,6 +166,18 @@ public class JdbcSourceTask extends SourceTask {
         tableQueue.add(new TimestampIncrementingTableQuerier(
             queryMode, tableOrQuery, topicPrefix, timestampColumn, incrementingColumn,
                 offset, timestampDelayInterval, schemaPattern, mapNumerics));
+      } else if (mode.equals(JdbcSourceTaskConfig.MODE_SHARDING_INCREMENTING)) {
+        tableQueue.add(new TimestampShardingTableQuerier(
+            queryMode, tableOrQuery, topicPrefix, null, incrementingColumn, offset,
+            timestampDelayInterval, schemaPattern, mapNumerics));
+      } else if (mode.equals(JdbcSourceTaskConfig.MODE_SHARDING_TIMESTAMP)) {
+        tableQueue.add(new TimestampShardingTableQuerier(
+            queryMode, tableOrQuery, topicPrefix, timestampColumn, null, offset,
+            timestampDelayInterval, schemaPattern, mapNumerics));
+      } else if (mode.endsWith(JdbcSourceTaskConfig.MODE_SHARDING_TIMESTAMP_INCREMENTING)) {
+        tableQueue.add(new TimestampShardingTableQuerier(
+            queryMode, tableOrQuery, topicPrefix, timestampColumn, incrementingColumn,
+            offset, timestampDelayInterval, schemaPattern, mapNumerics));
       }
     }
 
