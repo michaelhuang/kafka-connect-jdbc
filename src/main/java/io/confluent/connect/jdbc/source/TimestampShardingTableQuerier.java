@@ -131,7 +131,7 @@ public class TimestampShardingTableQuerier extends TableQuerier {
   }
 
   private void orderBy(StringBuilder builder, String quoteString) {
-    builder.append(") ORDER BY ");
+    builder.append(") as T ORDER BY ");
     if (incrementingColumn != null && timestampColumn != null) {
       builder.append(JdbcUtils.quoteString(timestampColumn, quoteString));
       builder.append(",");

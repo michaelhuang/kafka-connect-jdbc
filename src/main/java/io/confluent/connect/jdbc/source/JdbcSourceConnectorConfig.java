@@ -338,7 +338,10 @@ public class JdbcSourceConnectorConfig extends AbstractConfig {
             MODE_BULK,
             MODE_TIMESTAMP,
             MODE_INCREMENTING,
-            MODE_TIMESTAMP_INCREMENTING
+            MODE_TIMESTAMP_INCREMENTING,
+            MODE_SHARDING_TIMESTAMP,
+            MODE_SHARDING_INCREMENTING,
+            MODE_SHARDING_TIMESTAMP_INCREMENTING
         ),
         Importance.HIGH,
         MODE_DOC,
@@ -575,11 +578,14 @@ public class JdbcSourceConnectorConfig extends AbstractConfig {
         case MODE_BULK:
           return false;
         case MODE_TIMESTAMP:
+        case MODE_SHARDING_TIMESTAMP:
           return name.equals(TIMESTAMP_COLUMN_NAME_CONFIG) || name.equals(VALIDATE_NON_NULL_CONFIG);
         case MODE_INCREMENTING:
+        case MODE_SHARDING_INCREMENTING:
           return name.equals(INCREMENTING_COLUMN_NAME_CONFIG)
                  || name.equals(VALIDATE_NON_NULL_CONFIG);
         case MODE_TIMESTAMP_INCREMENTING:
+        case MODE_SHARDING_TIMESTAMP_INCREMENTING:
           return name.equals(TIMESTAMP_COLUMN_NAME_CONFIG)
                  || name.equals(INCREMENTING_COLUMN_NAME_CONFIG)
                  || name.equals(VALIDATE_NON_NULL_CONFIG);

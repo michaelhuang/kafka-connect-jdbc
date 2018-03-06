@@ -91,7 +91,10 @@ public class JdbcSourceTask extends SourceTask {
     Map<Map<String, String>, Map<String, Object>> offsets = null;
     if (mode.equals(JdbcSourceTaskConfig.MODE_INCREMENTING)
         || mode.equals(JdbcSourceTaskConfig.MODE_TIMESTAMP)
-        || mode.equals(JdbcSourceTaskConfig.MODE_TIMESTAMP_INCREMENTING)) {
+        || mode.equals(JdbcSourceTaskConfig.MODE_TIMESTAMP_INCREMENTING)
+        || mode.equals(JdbcSourceTaskConfig.MODE_SHARDING_INCREMENTING)
+        || mode.equals(JdbcSourceTaskConfig.MODE_SHARDING_TIMESTAMP)
+        || mode.equals(JdbcSourceTaskConfig.MODE_SHARDING_TIMESTAMP_INCREMENTING)) {
       List<Map<String, String>> partitions = new ArrayList<>(tables.size());
       switch (queryMode) {
         case TABLE:
@@ -162,7 +165,7 @@ public class JdbcSourceTask extends SourceTask {
         tableQueue.add(new TimestampIncrementingTableQuerier(
             queryMode, tableOrQuery, topicPrefix, timestampColumn, null, offset,
                 timestampDelayInterval, schemaPattern, mapNumerics));
-      } else if (mode.endsWith(JdbcSourceTaskConfig.MODE_TIMESTAMP_INCREMENTING)) {
+      } else if (mode.equals(JdbcSourceTaskConfig.MODE_TIMESTAMP_INCREMENTING)) {
         tableQueue.add(new TimestampIncrementingTableQuerier(
             queryMode, tableOrQuery, topicPrefix, timestampColumn, incrementingColumn,
                 offset, timestampDelayInterval, schemaPattern, mapNumerics));
@@ -174,7 +177,7 @@ public class JdbcSourceTask extends SourceTask {
         tableQueue.add(new TimestampShardingTableQuerier(
             queryMode, tableOrQuery, topicPrefix, timestampColumn, null, offset,
             timestampDelayInterval, schemaPattern, mapNumerics));
-      } else if (mode.endsWith(JdbcSourceTaskConfig.MODE_SHARDING_TIMESTAMP_INCREMENTING)) {
+      } else if (mode.equals(JdbcSourceTaskConfig.MODE_SHARDING_TIMESTAMP_INCREMENTING)) {
         tableQueue.add(new TimestampShardingTableQuerier(
             queryMode, tableOrQuery, topicPrefix, timestampColumn, incrementingColumn,
             offset, timestampDelayInterval, schemaPattern, mapNumerics));
@@ -294,14 +297,18 @@ public class JdbcSourceTask extends SourceTask {
       // for table-based copying because custom query mode doesn't allow this to be looked up
       // without a query or parsing the query since we don't have a table name.
       if ((incrementalMode.equals(JdbcSourceConnectorConfig.MODE_INCREMENTING)
-           || incrementalMode.equals(JdbcSourceConnectorConfig.MODE_TIMESTAMP_INCREMENTING))
+           || incrementalMode.equals(JdbcSourceConnectorConfig.MODE_TIMESTAMP_INCREMENTING)
+          || incrementalMode.equals(JdbcSourceConnectorConfig.MODE_SHARDING_INCREMENTING)
+          || incrementalMode.equals(JdbcSourceConnectorConfig.MODE_SHARDING_TIMESTAMP_INCREMENTING))
           && JdbcUtils.isColumnNullable(connection, schemaPattern, table, incrementingColumn)) {
         throw new ConnectException("Cannot make incremental queries using incrementing column "
                                    + incrementingColumn + " on " + table + " because this column "
                                    + "is nullable.");
       }
       if ((incrementalMode.equals(JdbcSourceConnectorConfig.MODE_TIMESTAMP)
-           || incrementalMode.equals(JdbcSourceConnectorConfig.MODE_TIMESTAMP_INCREMENTING))
+           || incrementalMode.equals(JdbcSourceConnectorConfig.MODE_TIMESTAMP_INCREMENTING)
+          || incrementalMode.equals(JdbcSourceConnectorConfig.MODE_SHARDING_TIMESTAMP)
+          || incrementalMode.equals(JdbcSourceConnectorConfig.MODE_SHARDING_TIMESTAMP_INCREMENTING))
           && JdbcUtils.isColumnNullable(connection, schemaPattern, table, timestampColumn)) {
         throw new ConnectException("Cannot make incremental queries using timestamp column "
                                    + timestampColumn + " on " + table + " because this column is "
