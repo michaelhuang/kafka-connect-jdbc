@@ -213,6 +213,11 @@ public class JdbcSourceTask extends SourceTask {
     if (cachedConnectionProvider != null) {
       cachedConnectionProvider.closeQuietly();
     }
+    // Only in case of shutdown
+    final TableQuerier querier = tableQueue.peek();
+    if (querier != null) {
+      resetAndRequeueHead(querier);
+    }
   }
 
   @Override
@@ -268,11 +273,6 @@ public class JdbcSourceTask extends SourceTask {
       }
     }
 
-    // Only in case of shutdown
-    final TableQuerier querier = tableQueue.peek();
-    if (querier != null) {
-      resetAndRequeueHead(querier);
-    }
     return null;
   }
 
